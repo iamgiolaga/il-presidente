@@ -1,5 +1,4 @@
 python-telegram-bot==13.11
 requests~=2.31.0
 schedule~=1.2.0
-django-scheduler~=0.10.1
 telegram~=0.0.1
