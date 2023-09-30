@@ -1,8 +1,7 @@
+import functions_framework
 import requests
-import schedule
-import time
 from datetime import datetime, timedelta
-from utils.constants import token, chat_id
+from constants import token, chat_id
 
 date_time_format = '%Y-%m-%dT%H:%M:%SZ'
 
@@ -50,14 +49,20 @@ def broadcast_channel(message):
     url = f'https://api.telegram.org/bot{token}/sendMessage?chat_id={chat_id}&text={message}'
     requests.get(url)
 
-def job():
+@functions_framework.http
+def remind_squad(request):
+    """HTTP Cloud Function.
+    Args:
+        request (flask.Request): The request object.
+        <https://flask.palletsprojects.com/en/1.1.x/api/#incoming-request-data>
+    Returns:
+        The response text, or any set of values that can be turned into a
+        Response object using `make_response`
+        <https://flask.palletsprojects.com/en/1.1.x/api/#flask.make_response>.
+    """
     match_day_id = get_match_day_id()
     next_day = get_next_day(match_day_id)
-    minutes_left = compute_minutes_left(next_day)
+    minutes_left = round(compute_minutes_left(next_day))
 
-    if round(minutes_left) == 110:
+    if 30 <= minutes_left <= 60:
         broadcast_channel("Ricordatevi la formazione!")
-
-
-if __name__ == '__main__':
-    job()
