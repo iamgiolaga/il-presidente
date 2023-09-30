@@ -1,5 +1,6 @@
 import requests
 import schedule
+import time
 from datetime import datetime, timedelta
 from utils.constants import token, chat_id
 
@@ -56,8 +57,11 @@ def job():
 
 
 if __name__ == '__main__':
-    job()
-    # schedule.every().hour.at(":00").do(job(updater))
-    # schedule.every().hour.at(":15").do(job(updater))
-    # schedule.every().hour.at(":30").do(job(updater))
-    # schedule.every().hour.at(":45").do(job(updater))
+    schedule.every().hour.at(":00").do(job)
+    schedule.every().hour.at(":15").do(job)
+    schedule.every().hour.at(":30").do(job)
+    schedule.every().hour.at(":45").do(job)
+    
+    while True:
+        schedule.run_pending()
+        time.sleep(1)
