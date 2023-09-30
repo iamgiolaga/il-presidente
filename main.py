@@ -38,8 +38,11 @@ def get_next_day(match_day_id):
         print(f'Errore: Impossibile eseguire la richiesta GET: {e}')
 
 
-def job(updater_instance):
+def job():
     logging.info("Job running")
+    updater = Updater(token=token, use_context=True)
+    dispatcher = updater.dispatcher
+    updater.start_webhook(listen="0.0.0.0", webhook_url=f'{hosting_url}/{token}', url_path=token, port=int(port))
     match_day_id = get_match_day_id()
     next_day = get_next_day(match_day_id)
     date_time = datetime.strptime(next_day, date_time_format)
@@ -47,17 +50,13 @@ def job(updater_instance):
     time_difference = date_time - current_time
 
     logging.info("match_day_id, next_day, date_time, current_time, time_difference", { match_day_id, next_day, date_time, current_time, time_difference})
-    
+
     if time_difference == timedelta(hours=2):
-        dispatcher = updater_instance.dispatcher
         dispatcher.bot.sendMessage("Ricordatevi la formazione!")
 
 
 if __name__ == '__main__':
-    updater = Updater(token=token, use_context=True)
-    updater.start_webhook(listen="0.0.0.0", webhook_url=f'{hosting_url}/{token}', url_path=token, port=int(port))
-
-    schedule.every().minute().do(job(updater))
+    schedule.every().minute().do(job)
     # schedule.every().hour.at(":00").do(job(updater))
     # schedule.every().hour.at(":15").do(job(updater))
     # schedule.every().hour.at(":30").do(job(updater))
