@@ -53,7 +53,8 @@ if __name__ == '__main__':
     updater = Updater(token=token, use_context=True)
     updater.start_webhook(listen="0.0.0.0", webhook_url=f'{hosting_url}/{token}', url_path=token, port=int(port))
 
-    schedule.every().hour.at(":00").do(job(updater))
-    schedule.every().hour.at(":15").do(job(updater))
-    schedule.every().hour.at(":30").do(job(updater))
-    schedule.every().hour.at(":45").do(job(updater))
+    schedule.every().minute().do(job(updater))
+    # schedule.every().hour.at(":00").do(job(updater))
+    # schedule.every().hour.at(":15").do(job(updater))
+    # schedule.every().hour.at(":30").do(job(updater))
+    # schedule.every().hour.at(":45").do(job(updater))
