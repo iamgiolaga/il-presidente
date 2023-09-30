@@ -37,10 +37,14 @@ def get_next_day(match_day_id):
         print(f'Errore: Impossibile eseguire la richiesta GET: {e}')
 
 
-def compute_time_difference(next_day):
+def compute_minutes_left(next_day):
     date_time = datetime.strptime(next_day, date_time_format)
     current_time = datetime.utcnow()
-    return date_time - current_time
+    time_diff = date_time - current_time
+    days = time_diff.days
+    seconds = time_diff.seconds
+    minutes = seconds / 60
+    return days*24*60 + minutes
 
 def broadcast_channel(message):
     url = f'https://api.telegram.org/bot{token}/sendMessage?chat_id={chat_id}&text={message}'
@@ -49,19 +53,11 @@ def broadcast_channel(message):
 def job():
     match_day_id = get_match_day_id()
     next_day = get_next_day(match_day_id)
-    time_difference = compute_time_difference(next_day)
-    broadcast_channel(f"Mancano {time_difference} ore")
+    minutes_left = compute_minutes_left(next_day)
 
-    #if time_difference == timedelta(hours=2):
-        # dispatcher.bot.sendMessage("Ricordatevi la formazione!")
+    if round(minutes_left) == 110:
+        broadcast_channel("Ricordatevi la formazione!")
 
 
 if __name__ == '__main__':
-    schedule.every().hour.at(":00").do(job)
-    schedule.every().hour.at(":15").do(job)
-    schedule.every().hour.at(":30").do(job)
-    schedule.every().hour.at(":45").do(job)
-    
-    while True:
-        schedule.run_pending()
-        time.sleep(1)
+    job()
