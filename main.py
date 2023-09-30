@@ -56,7 +56,7 @@ def job():
 
 
 if __name__ == '__main__':
-    schedule.every().minute.do(job)
+    job()
     # schedule.every().hour.at(":00").do(job(updater))
     # schedule.every().hour.at(":15").do(job(updater))
     # schedule.every().hour.at(":30").do(job(updater))
