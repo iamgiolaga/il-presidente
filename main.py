@@ -1,9 +1,12 @@
 import functions_framework
 import requests
+import pytz
 from datetime import datetime, timedelta
 from constants import token, chat_id
 
 date_time_format = '%Y-%m-%dT%H:%M:%SZ'
+time_format = '%H:%M'
+italian_tz = pytz.timezone('Europe/Rome')
 
 def get_match_day_id():
     url = "https://www.legaseriea.it/api/season/157617/championship/A/matchday?lang=it"
@@ -36,8 +39,7 @@ def get_next_day(match_day_id):
         print(f'Errore: Impossibile eseguire la richiesta GET: {e}')
 
 
-def compute_minutes_left(next_day):
-    date_time = datetime.strptime(next_day, date_time_format)
+def compute_minutes_left(date_time):
     current_time = datetime.utcnow()
     time_diff = date_time - current_time
     days = time_diff.days
@@ -51,18 +53,16 @@ def broadcast_channel(message):
 
 @functions_framework.http
 def remind_squad(request):
-    """HTTP Cloud Function.
-    Args:
-        request (flask.Request): The request object.
-        <https://flask.palletsprojects.com/en/1.1.x/api/#incoming-request-data>
-    Returns:
-        The response text, or any set of values that can be turned into a
-        Response object using `make_response`
-        <https://flask.palletsprojects.com/en/1.1.x/api/#flask.make_response>.
-    """
     match_day_id = get_match_day_id()
     next_day = get_next_day(match_day_id)
-    minutes_left = round(compute_minutes_left(next_day))
+    date_time = datetime.strptime(next_day, date_time_format)
+    match_time = date_time.strftime(time_format)
+    minutes_left = round(compute_minutes_left(date_time))
 
-    if 30 <= minutes_left <= 60:
-        broadcast_channel("Ricordatevi la formazione!")
+    match_time = date_time.replace(tzinfo=pytz.utc).astimezone(italian_tz)
+    match_time_str = match_time.strftime(time_format)
+
+    minutes_left = round(compute_minutes_left(date_time))
+
+    if 90 <= minutes_left <= 120:
+        broadcast_channel(f'Ricordatevi la formazione! Si gioca alle {match_time_str}!')
