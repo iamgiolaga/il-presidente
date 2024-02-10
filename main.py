@@ -15,7 +15,7 @@ def get_match_day_id():
         if response.status_code == 200:
             data = response.json()['data']
             for item in data:
-                if item["category_status"] == "TO BE PLAYED":
+                if item["category_status"] in ["TO BE PLAYED", "LIVE"]:
                     return item["id_category"]
             return
         else:
